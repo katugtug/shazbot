@@ -22,12 +22,12 @@ def stop():
     
 def listenForPhrase(recognizer, mic):
     with mic as source:
-        audio = recognizer.listen(source)
+        audio = recognizer.listen(source, phrase_time_limit=5)
     return audio
 
 def prepare_recognizer(recognizer, mic):
     with mic as source:
-        recognizer.adjust_for_ambient_noise(source, duration=3)
+        recognizer.adjust_for_ambient_noise(source, duration=1)
 
 def playSound(sound):
     print("playing " + sound)
