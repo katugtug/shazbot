@@ -22,9 +22,12 @@ def stop():
     
 def listenForPhrase(recognizer, mic):
     with mic as source:
-        recognizer.adjust_for_ambient_noise(source)
         audio = recognizer.listen(source)
     return audio
+
+def prepare_recognizer(recognizer, mic):
+    with mic as source:
+        recognizer.adjust_for_ambient_noise(source, duration=3)
 
 def playSound(sound):
     print("playing " + sound)
@@ -36,21 +39,23 @@ def checkMappings(transcriptions, mappings):
         if "transcript" not in transcriptDict:
             continue
         for mapping in list(mappings.keys()):
-            match = re.search(mapping, transcriptDict['transcript'])
+            match = re.search(mapping, transcriptDict['transcript'],re.IGNORECASE)
             if match != None:
                 playSound(mappings[mapping])
 
 def start():
     global gameon
+    recognizer = sr.Recognizer()
+    mic = sr.Microphone()
+    prepare_recognizer(recognizer,mic)
     while gameon == True:
         try:
-            recognizer = sr.Recognizer()
-            mic = sr.Microphone()
             audio = listenForPhrase(recognizer, mic)
             transcriptions = recognizer.recognize_google(audio, show_all=True)
             checkMappings(transcriptions, mappings)
             print(transcriptions)
         except sr.RequestError as e:
             print(e)
+            stop()
 
 start()
